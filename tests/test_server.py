@@ -1,4 +1,4 @@
-"""Smoke tests for the sqlfluff-mcp tool functions.
+"""Smoke tests for the sqlfluff-mcp-server tool functions.
 
 These call the tool functions directly (bypassing the MCP transport layer)
 since FastMCP's @mcp.tool() decorator leaves the underlying function

@@ -1,4 +1,4 @@
-# sqlfluff-mcp
+# sqlfluff-mcp-server
 
 An [MCP](https://modelcontextprotocol.io) server that exposes [SQLFluff](https://sqlfluff.com)'s
 linting, fixing, and parsing over the Model Context Protocol, so any MCP-aware
@@ -35,14 +35,14 @@ file location to resolve config from.
 
 ```bash
 git clone <this-repo-url>
-cd sqlfluff-mcp
+cd sqlfluff-mcp-server
 uv sync            # or: pip install -e ".[dev]"
 ```
 
 ## Run
 
 ```bash
-uv run sqlfluff-mcp          # or: sqlfluff-mcp, if installed on PATH
+uv run sqlfluff-mcp-server          # or: sqlfluff-mcp-server, if installed on PATH
 ```
 
 This starts the server over stdio, the standard transport for MCP clients
@@ -57,7 +57,7 @@ Example Claude Desktop / Claude Code config entry:
   "mcpServers": {
     "sqlfluff": {
       "command": "uv",
-      "args": ["--directory", "/path/to/sqlfluff-mcp", "run", "sqlfluff-mcp"]
+      "args": ["--directory", "/path/to/sqlfluff-mcp-server", "run", "sqlfluff-mcp-server"]
     }
   }
 }

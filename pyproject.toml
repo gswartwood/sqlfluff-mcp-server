@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "sqlfluff-mcp"
+name = "sqlfluff-mcp-server"
 version = "0.1.0"
 description = "MCP server exposing SQLFluff linting, fixing, and parsing over the Model Context Protocol."
 readme = "README.md"
@@ -16,7 +16,7 @@ dependencies = [
 ]
 
 [project.scripts]
-sqlfluff-mcp = "sqlfluff_mcp.server:main"
+sqlfluff-mcp-server = "sqlfluff_mcp.server:main"
 
 [project.optional-dependencies]
 dev = [
