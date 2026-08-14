@@ -1,0 +1,104 @@
+{
+  "identifier": "gswartwood-sqlfluff-mcp-server",
+  "name": "SQLFluff MCP Server",
+  "version": "0.2.0",
+  "description": "Lint, fix, and parse SQL via SQLFluff over the Model Context Protocol, honoring project .sqlfluff/pyproject.toml config.",
+  "author": "Guy Swartwood",
+  "authorUrl": "https://github.com/gswartwood",
+  "homepage": "https://github.com/gswartwood/sqlfluff-mcp-server",
+  "category": "developer",
+  "tags": ["sql", "sqlfluff", "linting", "formatting", "database"],
+  "tools": [
+    {
+      "name": "lint_file",
+      "description": "Lint a SQL file on disk, honoring any .sqlfluff / pyproject.toml config discovered by walking up from the file's directory.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": { "type": "string" },
+          "config_path": { "type": "string" }
+        },
+        "required": ["path"]
+      }
+    },
+    {
+      "name": "fix_file",
+      "description": "Fix a SQL file on disk, honoring discovered .sqlfluff config, optionally writing the result back.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": { "type": "string" },
+          "write": { "type": "boolean" },
+          "config_path": { "type": "string" }
+        },
+        "required": ["path"]
+      }
+    },
+    {
+      "name": "parse_file",
+      "description": "Parse a SQL file on disk and return its parse tree, honoring discovered config.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": { "type": "string" },
+          "config_path": { "type": "string" }
+        },
+        "required": ["path"]
+      }
+    },
+    {
+      "name": "lint_sql",
+      "description": "Lint a raw SQL string using an explicitly specified dialect.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "sql": { "type": "string" },
+          "dialect": { "type": "string" },
+          "rules": { "type": "array", "items": { "type": "string" } }
+        },
+        "required": ["sql", "dialect"]
+      }
+    },
+    {
+      "name": "fix_sql",
+      "description": "Fix a raw SQL string using an explicitly specified dialect and return the cleaned SQL.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "sql": { "type": "string" },
+          "dialect": { "type": "string" },
+          "rules": { "type": "array", "items": { "type": "string" } }
+        },
+        "required": ["sql", "dialect"]
+      }
+    },
+    {
+      "name": "parse_sql",
+      "description": "Parse a raw SQL string using an explicitly specified dialect and return its parse tree.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "sql": { "type": "string" },
+          "dialect": { "type": "string" }
+        },
+        "required": ["sql", "dialect"]
+      }
+    },
+    {
+      "name": "list_dialects",
+      "description": "List the SQL dialects SQLFluff supports (for use with lint_sql / fix_sql / parse_sql).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      }
+    },
+    {
+      "name": "clear_config_cache",
+      "description": "Clear SQLFluff's internal config-file cache, so edits to .sqlfluff/pyproject.toml made after the server started are picked up.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      }
+    }
+  ]
+}
