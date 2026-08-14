@@ -50,18 +50,11 @@ cd sqlfluff-mcp-server
 uv sync            # or: pip install -e ".[dev]"
 ```
 
-## Run
+## Registering with an MCP client
 
-```bash
-uv run sqlfluff-mcp-server          # or: sqlfluff-mcp-server, if installed on PATH
-```
-
-This starts the server over stdio, the standard transport for MCP clients
-that launch servers as a subprocess (Claude Desktop, Claude Code, etc.).
-
-### Registering with an MCP client
-
-Example Claude Desktop / Claude Code config entry:
+You don't need to start this server yourself. Register it in your MCP
+client's config (e.g. `.claude.json` / `.mcp.json` for Claude Code, or
+Claude Desktop's config file):
 
 ```json
 {
@@ -73,6 +66,24 @@ Example Claude Desktop / Claude Code config entry:
   }
 }
 ```
+
+For stdio-based servers like this one, the client itself launches the
+process — automatically, when the client session starts, not when a prompt
+first needs it. Once it's registered, just ask the client to lint or fix a
+SQL file; the server is already running in the background and the tools are
+already available. If the server process crashes, the client restarts it
+for you.
+
+### Running it manually (for local testing/debugging)
+
+```bash
+uv run sqlfluff-mcp-server          # or: sqlfluff-mcp-server, if installed on PATH
+```
+
+This starts the server over stdio and blocks, waiting for an MCP client to
+speak the protocol to it on stdin/stdout — it's not something you'd run
+interactively day to day, just useful for sanity-checking the install or
+piping through the [MCP Inspector](https://modelcontextprotocol.io/docs/tools/inspector).
 
 ## Development
 
