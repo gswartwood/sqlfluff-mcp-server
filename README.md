@@ -40,32 +40,29 @@ proactively before a lint/fix/parse call if you're unsure.
 ## Requirements
 
 - Python 3.10+
-- [uv](https://docs.astral.sh/uv/) (recommended) or `pip`
-
-## Install
-
-```bash
-git clone <this-repo-url>
-cd sqlfluff-mcp-server
-uv sync            # or: pip install -e ".[dev]"
-```
+- [uv](https://docs.astral.sh/uv/) (recommended) or `pipx`/`pip`
 
 ## Registering with an MCP client
 
-You don't need to start this server yourself. Register it in your MCP
+This package is published on [PyPI](https://pypi.org/project/sqlfluff-mcp-server/),
+so there's nothing to clone or install ahead of time. Point your MCP
 client's config (e.g. `.claude.json` / `.mcp.json` for Claude Code, or
-Claude Desktop's config file):
+Claude Desktop's config file) at it via `uvx`, and it's fetched into an
+isolated cache and launched on demand:
 
 ```json
 {
   "mcpServers": {
     "sqlfluff": {
-      "command": "uv",
-      "args": ["--directory", "/path/to/sqlfluff-mcp-server", "run", "sqlfluff-mcp-server"]
+      "command": "uvx",
+      "args": ["sqlfluff-mcp-server"]
     }
   }
 }
 ```
+
+No `uv`? `pipx run sqlfluff-mcp-server` as the `command`/`args` works the
+same way.
 
 For stdio-based servers like this one, the client itself launches the
 process — automatically, when the client session starts, not when a prompt
@@ -77,7 +74,7 @@ for you.
 ### Running it manually (for local testing/debugging)
 
 ```bash
-uv run sqlfluff-mcp-server          # or: sqlfluff-mcp-server, if installed on PATH
+uvx sqlfluff-mcp-server
 ```
 
 This starts the server over stdio and blocks, waiting for an MCP client to
@@ -87,10 +84,29 @@ piping through the [MCP Inspector](https://modelcontextprotocol.io/docs/tools/in
 
 ## Development
 
+Clone the repo to work on the server itself (rather than just consuming it
+via `uvx`):
+
 ```bash
+git clone <this-repo-url>
+cd sqlfluff-mcp-server
 uv sync --extra dev
 uv run pytest
 uv run ruff check .
+```
+
+To point an MCP client at your local checkout instead of the PyPI release
+(e.g. to test unreleased changes):
+
+```json
+{
+  "mcpServers": {
+    "sqlfluff": {
+      "command": "uv",
+      "args": ["--directory", "/path/to/sqlfluff-mcp-server", "run", "sqlfluff-mcp-server"]
+    }
+  }
+}
 ```
 
 ## Notes on dependencies
