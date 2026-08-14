@@ -18,6 +18,7 @@ around the public `sqlfluff` Python package.
 | `fix_sql` | raw SQL text + `dialect` | none — dialect supplied explicitly |
 | `parse_sql` | raw SQL text + `dialect` | none — dialect supplied explicitly |
 | `list_dialects` | — | lists supported dialect names |
+| `clear_config_cache` | — | clears SQLFluff's cached config-file contents |
 
 The `*_file` tools honor project config the same way the `sqlfluff` CLI does
 (via `FluffConfig.from_path`, which walks up the directory tree looking for
@@ -25,6 +26,16 @@ The `*_file` tools honor project config the same way the `sqlfluff` CLI does
 are for content that hasn't been written to disk (e.g. streamed from an
 editor buffer) and require you to pass `dialect` explicitly since there's no
 file location to resolve config from.
+
+### Config caching
+
+SQLFluff caches the contents of config files it reads while walking a
+directory tree, for the lifetime of the process. Because this server is
+long-running (unlike the `sqlfluff` CLI, which is a fresh process per
+invocation), editing a `.sqlfluff` file after the server has started won't
+be picked up by `lint_file` / `fix_file` / `parse_file` until you call
+`clear_config_cache`. Call it whenever config on disk changes, or just
+proactively before a lint/fix/parse call if you're unsure.
 
 ## Requirements
 
@@ -39,18 +50,11 @@ cd sqlfluff-mcp-server
 uv sync            # or: pip install -e ".[dev]"
 ```
 
-## Run
+## Registering with an MCP client
 
-```bash
-uv run sqlfluff-mcp-server          # or: sqlfluff-mcp-server, if installed on PATH
-```
-
-This starts the server over stdio, the standard transport for MCP clients
-that launch servers as a subprocess (Claude Desktop, Claude Code, etc.).
-
-### Registering with an MCP client
-
-Example Claude Desktop / Claude Code config entry:
+You don't need to start this server yourself. Register it in your MCP
+client's config (e.g. `.claude.json` / `.mcp.json` for Claude Code, or
+Claude Desktop's config file):
 
 ```json
 {
@@ -63,6 +67,24 @@ Example Claude Desktop / Claude Code config entry:
 }
 ```
 
+For stdio-based servers like this one, the client itself launches the
+process — automatically, when the client session starts, not when a prompt
+first needs it. Once it's registered, just ask the client to lint or fix a
+SQL file; the server is already running in the background and the tools are
+already available. If the server process crashes, the client restarts it
+for you.
+
+### Running it manually (for local testing/debugging)
+
+```bash
+uv run sqlfluff-mcp-server          # or: sqlfluff-mcp-server, if installed on PATH
+```
+
+This starts the server over stdio and blocks, waiting for an MCP client to
+speak the protocol to it on stdin/stdout — it's not something you'd run
+interactively day to day, just useful for sanity-checking the install or
+piping through the [MCP Inspector](https://modelcontextprotocol.io/docs/tools/inspector).
+
 ## Development
 
 ```bash
@@ -73,9 +95,10 @@ uv run ruff check .
 
 ## Notes on dependencies
 
-- `mcp` is pinned to `<2.0.0`. The SDK's 2.0 line restructured the
-  high-level server API (no more `mcp.server.fastmcp.FastMCP`); this project
-  hasn't been migrated yet.
+- `mcp` is pinned to `>=2.0.0,<3.0.0`. The SDK's 2.0 line renamed
+  `mcp.server.fastmcp.FastMCP` to `mcp.server.mcpserver.MCPServer` and moved
+  transport selection to `run(transport=...)`; the `@mcp.tool()` decorator
+  API is unchanged.
 - `sqlfluff` is left unpinned above `3.0.0` — SQLFluff releases fairly often
   and this server only depends on its stable `Linter` / `FluffConfig` API.
 

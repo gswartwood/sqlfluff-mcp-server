@@ -12,7 +12,15 @@ from pathlib import Path
 import pytest
 from sqlfluff.core.errors import SQLFluffUserError
 
-from sqlfluff_mcp.server import fix_file, fix_sql, lint_file, lint_sql, list_dialects, parse_sql
+from sqlfluff_mcp.server import (
+    clear_config_cache,
+    fix_file,
+    fix_sql,
+    lint_file,
+    lint_sql,
+    list_dialects,
+    parse_sql,
+)
 
 BAD_SQL = "select   1,2 from foo\n"
 
@@ -76,3 +84,27 @@ def test_fix_file_write_flag(tmp_path: Path):
 def test_lint_file_missing_file_raises(tmp_path: Path):
     with pytest.raises(SQLFluffUserError):
         lint_file(str(tmp_path / "does_not_exist.sql"))
+
+
+def test_config_cache_goes_stale_and_clear_config_cache_fixes_it(tmp_path: Path):
+    # SQLFluff caches config-file *contents* for the life of the process
+    # (functools.cache, keyed only on filepath -- no mtime check). This
+    # reproduces that staleness and confirms clear_config_cache() resets it.
+    config_file = tmp_path / ".sqlfluff"
+    config_file.write_text("[sqlfluff]\ndialect = ansi\n", encoding="utf-8")
+    sql_file = tmp_path / "query.sql"
+    sql_file.write_text("SELECT 1\n", encoding="utf-8")
+
+    first = lint_file(str(sql_file))
+    assert first["dialect"] == "ansi"
+
+    # Edit the config on disk after SQLFluff has already cached it.
+    config_file.write_text("[sqlfluff]\ndialect = postgres\n", encoding="utf-8")
+
+    stale = lint_file(str(sql_file))
+    assert stale["dialect"] == "ansi"  # proves the cache is stale
+
+    clear_config_cache()
+
+    fresh = lint_file(str(sql_file))
+    assert fresh["dialect"] == "postgres"  # cache cleared, config re-read

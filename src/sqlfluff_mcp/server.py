@@ -11,6 +11,12 @@ Two families of tools are provided:
   since there is no file location to resolve config from.
 
 Both families can lint, fix, or parse.
+
+SQLFluff caches the contents of config files it discovers while walking a
+directory tree, for the lifetime of the process. Since this server is a
+long-running process, edits to a project's .sqlfluff (or pyproject.toml /
+setup.cfg / tox.ini) made after this server started won't be picked up by
+the *_file tools until ``clear_config_cache`` is called.
 """
 
 from __future__ import annotations
@@ -19,13 +25,14 @@ import logging
 from pathlib import Path
 from typing import Any
 
-from mcp.server.fastmcp import FastMCP
+from mcp.server.mcpserver import MCPServer
 from sqlfluff.core import FluffConfig, Linter
+from sqlfluff.core.config import clear_config_caches
 from sqlfluff.core.errors import SQLFluffUserError
 
 logger = logging.getLogger("sqlfluff_mcp")
 
-mcp = FastMCP(
+mcp = MCPServer(
     name="sqlfluff",
     instructions=(
         "Lint, fix, and parse SQL using SQLFluff. Use the *_file tools when "
@@ -237,9 +244,25 @@ def list_dialects() -> list[dict[str, str]]:
     return [{"label": d.label, "name": d.name} for d in sqlfluff.list_dialects()]
 
 
+@mcp.tool()
+def clear_config_cache() -> dict[str, str]:
+    """Clear SQLFluff's internal config-file cache.
+
+    SQLFluff caches the *contents* of .sqlfluff / pyproject.toml / setup.cfg
+    / tox.ini files it reads while walking up a directory tree (keyed by
+    file path, for the lifetime of this server process). If you edit a
+    config file on disk while this server is running, the *_file tools may
+    keep returning results based on the old contents until this cache is
+    cleared. Call this tool after editing any SQLFluff config file to force
+    the next lint_file / fix_file / parse_file call to re-read it from disk.
+    """
+    clear_config_caches()
+    return {"status": "cleared"}
+
+
 def main() -> None:
     logging.basicConfig(level=logging.INFO)
-    mcp.run()
+    mcp.run(transport="stdio")
 
 
 if __name__ == "__main__":
