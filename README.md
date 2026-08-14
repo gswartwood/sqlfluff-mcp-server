@@ -95,9 +95,10 @@ uv run ruff check .
 
 ## Notes on dependencies
 
-- `mcp` is pinned to `<2.0.0`. The SDK's 2.0 line restructured the
-  high-level server API (no more `mcp.server.fastmcp.FastMCP`); this project
-  hasn't been migrated yet.
+- `mcp` is pinned to `>=2.0.0,<3.0.0`. The SDK's 2.0 line renamed
+  `mcp.server.fastmcp.FastMCP` to `mcp.server.mcpserver.MCPServer` and moved
+  transport selection to `run(transport=...)`; the `@mcp.tool()` decorator
+  API is unchanged.
 - `sqlfluff` is left unpinned above `3.0.0` — SQLFluff releases fairly often
   and this server only depends on its stable `Linter` / `FluffConfig` API.
 

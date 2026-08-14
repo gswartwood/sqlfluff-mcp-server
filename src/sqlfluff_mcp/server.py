@@ -25,14 +25,14 @@ import logging
 from pathlib import Path
 from typing import Any
 
-from mcp.server.fastmcp import FastMCP
+from mcp.server.mcpserver import MCPServer
 from sqlfluff.core import FluffConfig, Linter
 from sqlfluff.core.config import clear_config_caches
 from sqlfluff.core.errors import SQLFluffUserError
 
 logger = logging.getLogger("sqlfluff_mcp")
 
-mcp = FastMCP(
+mcp = MCPServer(
     name="sqlfluff",
     instructions=(
         "Lint, fix, and parse SQL using SQLFluff. Use the *_file tools when "
@@ -262,7 +262,7 @@ def clear_config_cache() -> dict[str, str]:
 
 def main() -> None:
     logging.basicConfig(level=logging.INFO)
-    mcp.run()
+    mcp.run(transport="stdio")
 
 
 if __name__ == "__main__":
