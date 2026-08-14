@@ -4,12 +4,17 @@ build-backend = "hatchling.build"
 
 [project]
 name = "sqlfluff-mcp-server"
-version = "0.2.0"
+version = "0.2.1"
 description = "MCP server exposing SQLFluff linting, fixing, and parsing over the Model Context Protocol."
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }
 authors = [{ name = "Guy Swartwood" }]
+classifiers = [
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
 dependencies = [
     "mcp>=2.0.0,<3.0.0",
     "sqlfluff>=3.0.0",
