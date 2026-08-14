@@ -1,5 +1,10 @@
 # sqlfluff-mcp-server
 
+[![PyPI](https://img.shields.io/pypi/v/sqlfluff-mcp-server)](https://pypi.org/project/sqlfluff-mcp-server/)
+[![Python versions](https://img.shields.io/pypi/pyversions/sqlfluff-mcp-server)](https://pypi.org/project/sqlfluff-mcp-server/)
+[![CI](https://github.com/gswartwood/sqlfluff-mcp-server/actions/workflows/ci.yml/badge.svg)](https://github.com/gswartwood/sqlfluff-mcp-server/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
 An [MCP](https://modelcontextprotocol.io) server that exposes [SQLFluff](https://sqlfluff.com)'s
 linting, fixing, and parsing over the Model Context Protocol, so any MCP-aware
 client (Claude, other agents, IDE integrations) can lint and fix SQL directly.
@@ -41,6 +46,8 @@ proactively before a lint/fix/parse call if you're unsure.
 
 - Python 3.10+
 - [uv](https://docs.astral.sh/uv/) (recommended) or `pipx`/`pip`
+- `mcp` >=2.0.0,<3.0.0 and `sqlfluff` >=3.0.0 (installed automatically as
+  dependencies — see [Notes on dependencies](#notes-on-dependencies))
 
 ## Registering with an MCP client
 
