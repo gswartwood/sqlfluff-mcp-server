@@ -18,6 +18,7 @@ around the public `sqlfluff` Python package.
 | `fix_sql` | raw SQL text + `dialect` | none — dialect supplied explicitly |
 | `parse_sql` | raw SQL text + `dialect` | none — dialect supplied explicitly |
 | `list_dialects` | — | lists supported dialect names |
+| `clear_config_cache` | — | clears SQLFluff's cached config-file contents |
 
 The `*_file` tools honor project config the same way the `sqlfluff` CLI does
 (via `FluffConfig.from_path`, which walks up the directory tree looking for
@@ -25,6 +26,16 @@ The `*_file` tools honor project config the same way the `sqlfluff` CLI does
 are for content that hasn't been written to disk (e.g. streamed from an
 editor buffer) and require you to pass `dialect` explicitly since there's no
 file location to resolve config from.
+
+### Config caching
+
+SQLFluff caches the contents of config files it reads while walking a
+directory tree, for the lifetime of the process. Because this server is
+long-running (unlike the `sqlfluff` CLI, which is a fresh process per
+invocation), editing a `.sqlfluff` file after the server has started won't
+be picked up by `lint_file` / `fix_file` / `parse_file` until you call
+`clear_config_cache`. Call it whenever config on disk changes, or just
+proactively before a lint/fix/parse call if you're unsure.
 
 ## Requirements
 
